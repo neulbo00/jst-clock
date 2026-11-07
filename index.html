@@ -3,251 +3,399 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>JST Field Clock</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <title>JST Field Clock (현장용 타이머)</title>
     <style>
-        body {
-            font-family: 'Noto Sans KR', sans-serif;
-            background-color: #000000;
-            color: #f1f5f9;
-            touch-action: manipulation;
+        /* Base Styling & Pure System Fonts (Zero Network Dependencies) */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-user-select: none;
+            user-select: none;
         }
-        .mono-font {
-            font-family: 'JetBrains Mono', monospace;
+
+        body {
+            background-color: #000000;
+            color: #e2e8f0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 16px;
+            overflow: hidden;
+        }
+
+        /* Monospace Tabular Font for Ultra-Stable Digits */
+        .num-font {
+            font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
             font-variant-numeric: tabular-nums;
         }
-        .text-red-glow {
-            color: #ff1a1a;
-            text-shadow: 0 0 12px rgba(255, 0, 0, 0.3);
+
+        /* Header */
+        header {
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 18px;
+            background-color: #111827;
+            border: 1px solid #1f2937;
+            border-radius: 12px;
         }
-        .text-white-glow {
+
+        .tag-jst {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            color: #94a3b8;
+        }
+
+        .dot-green {
+            width: 8px;
+            height: 8px;
+            background-color: #22c55e;
+            border-radius: 50%;
+        }
+
+        .date-display {
+            font-size: 15px;
+            font-weight: 700;
+            color: #cbd5e1;
+            letter-spacing: 0.05em;
+        }
+
+        /* Main Clock Area */
+        main {
+            margin: auto 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 20px 0;
+        }
+
+        .clock-card {
+            background-color: #030712;
+            border: 1px solid #1f2937;
+            border-radius: 20px;
+            padding: 30px 20px;
+            width: 100%;
+            max-width: 900px;
+            display: flex;
+            align-items: baseline;
+            justify-content: center;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+            transition: transform 0.1s ease;
+        }
+
+        /* High Contrast Color Modes */
+        .color-red {
+            color: #ff1111 !important;
+        }
+
+        .color-white {
+            color: #ffffff !important;
+        }
+
+        .time-main {
+            font-size: clamp(3.2rem, 14vw, 11rem);
+            font-weight: 900;
+            line-height: 1;
+            letter-spacing: -0.03em;
+        }
+
+        .time-sub {
+            display: inline-flex;
+            align-items: baseline;
+            margin-left: 4px;
+        }
+
+        .time-dot {
+            font-size: clamp(2.5rem, 8vw, 6rem);
+            font-weight: 300;
+        }
+
+        .time-ms {
+            font-size: clamp(2.8rem, 9vw, 7rem);
+            font-weight: 800;
+            width: 1ch;
+            text-align: left;
+        }
+
+        /* Control Toolbar */
+        footer {
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .toolbar {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        @media (min-width: 640px) {
+            .toolbar {
+                display: flex;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+        }
+
+        .btn {
+            background-color: #1e293b;
+            border: 1px solid #334155;
+            color: #cbd5e1;
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: background-color 0.15s, transform 0.05s;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .btn:active {
+            background-color: #334155;
+            transform: scale(0.97);
+        }
+
+        .btn-active {
+            background-color: #7f1d1d;
+            border-color: #ef4444;
+            color: #fca5a5;
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: #64748b;
+            padding: 0 4px;
+        }
+
+        /* Error Fallback Box */
+        #error-banner {
+            display: none;
+            background-color: #991b1b;
             color: #ffffff;
-            text-shadow: 0 0 12px rgba(255, 255, 255, 0.3);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 12px;
+            margin-bottom: 10px;
+            text-align: center;
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between p-4 sm:p-6 select-none">
+<body>
 
-    <!-- Header / Date & Weather -->
-    <header class="w-full max-w-4xl mx-auto flex flex-col sm:flex-row justify-between items-center bg-slate-900/80 border border-slate-800 rounded-xl px-5 py-3 backdrop-blur-sm gap-2">
-        <div class="flex items-center gap-3">
-            <span class="inline-block w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse"></span>
-            <span class="text-xs sm:text-sm font-semibold tracking-wider text-slate-400">JAPAN STANDARD TIME (UTC+9)</span>
+    <!-- Header: JST Date -->
+    <header>
+        <div class="tag-jst">
+            <span class="dot-green"></span>
+            <span>JST (UTC+9)</span>
         </div>
-        <div class="flex items-center gap-4">
-            <div id="jst-date" class="mono-font text-sm sm:text-base font-bold text-slate-200">2026.00.00 (...)</div>
-            <div id="tokyo-weather" class="mono-font text-xs sm:text-sm text-slate-400 bg-slate-800/80 px-3 py-1 rounded-lg border border-slate-700/50">
-                도쿄 날씨 확인중...
-            </div>
-        </div>
+        <div id="jst-date" class="date-display num-font">----.--.-- (--)</div>
     </header>
 
+    <!-- Error Fallback Message -->
+    <div id="error-banner">경고: 시간 업데이트 중 오류 발생</div>
+
     <!-- Main Clock Section -->
-    <main class="w-full max-w-4xl mx-auto flex flex-col items-center justify-center my-auto py-8">
-        <div class="text-center w-full">
-            <!-- Clock Display -->
-            <div class="inline-flex items-baseline justify-center flex-wrap px-4 py-6 bg-slate-950/90 border border-slate-800/80 rounded-2xl shadow-2xl w-full">
-                <span id="clock-hours" class="mono-font font-extrabold text-7xl sm:text-9xl tracking-tight transition-all">00</span>
-                <span class="mono-font font-bold text-6xl sm:text-8xl mx-1 sm:mx-2 text-slate-600 animate-pulse">:</span>
-                <span id="clock-minutes" class="mono-font font-extrabold text-7xl sm:text-9xl tracking-tight transition-all">00</span>
-                <span class="mono-font font-bold text-6xl sm:text-8xl mx-1 sm:mx-2 text-slate-600 animate-pulse">:</span>
-                <span id="clock-seconds" class="mono-font font-extrabold text-7xl sm:text-9xl tracking-tight transition-all">00</span>
-                <span class="mono-font font-bold text-6xl sm:text-8xl mx-1 sm:mx-2 text-slate-600">.</span>
-                <span id="clock-millis" class="mono-font font-bold text-4xl sm:text-6xl text-slate-400 w-16 sm:w-24 text-left">0</span>
-            </div>
+    <main>
+        <div id="clock-card" class="clock-card">
+            <!-- Main HH:MM:SS -->
+            <span id="time-main" class="time-main num-font color-red">00:00:00</span>
+            <!-- Millisecond .d (1/10s) -->
+            <span class="time-sub">
+                <span id="time-dot" class="time-dot num-font color-red">.</span>
+                <span id="time-ms" class="time-ms num-font color-red">0</span>
+            </span>
         </div>
     </main>
 
-    <!-- Footer Controls & Status -->
-    <footer class="w-full max-w-4xl mx-auto flex flex-col gap-3">
-        <!-- Controls Toolbar -->
-        <div class="grid grid-cols-2 sm:flex sm:flex-wrap justify-center gap-2">
-            <!-- Color Mode Toggle -->
-            <button id="btn-color" onclick="toggleColorMode()" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs sm:text-sm font-semibold rounded-xl border border-slate-700 transition flex items-center justify-center gap-2">
-                <span id="color-indicator" class="w-3 h-3 rounded-full bg-red-500 inline-block"></span>
-                <span id="color-text">레드 모드</span>
+    <!-- Footer Controls -->
+    <footer>
+        <div class="toolbar">
+            <!-- Color Toggle -->
+            <button id="btn-color" class="btn">
+                <span>🎨 <span id="txt-color">RED 모드</span></span>
             </button>
 
-            <!-- Font Size - -->
-            <button onclick="adjustFontSize(-10)" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs sm:text-sm font-semibold rounded-xl border border-slate-700 transition">
-                글자 작게 (-)
+            <!-- Font Sizes -->
+            <button id="btn-down" class="btn">글자 작게 (-)</button>
+            <button id="btn-up" class="btn">글자 크게 (+)</button>
+
+            <!-- Wake Lock -->
+            <button id="btn-wake" class="btn">
+                <span>💡 화면유지: <span id="txt-wake" style="color: #ef4444;">OFF</span></span>
             </button>
 
-            <!-- Font Size + -->
-            <button onclick="adjustFontSize(10)" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs sm:text-sm font-semibold rounded-xl border border-slate-700 transition">
-                글자 크게 (+)
-            </button>
-
-            <!-- Wake Lock Toggle -->
-            <button id="btn-wakelock" onclick="toggleWakeLock()" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs sm:text-sm font-semibold rounded-xl border border-slate-700 transition flex items-center justify-center gap-2">
-                <span>💡 화면유지: <span id="wakelock-status" class="text-red-400">OFF</span></span>
-            </button>
-
-            <!-- Fullscreen Toggle -->
-            <button onclick="toggleFullScreen()" class="col-span-2 sm:col-span-1 px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs sm:text-sm font-semibold rounded-xl border border-slate-700 transition">
-                전체 화면 ⤢
-            </button>
+            <!-- Fullscreen -->
+            <button id="btn-full" class="btn">전체화면 ⤢</button>
         </div>
 
-        <!-- System Status Bar -->
-        <div class="flex flex-col sm:flex-row justify-between items-center text-xs text-slate-500 px-2 py-1 gap-1">
-            <div class="flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                <span>NICT-aligned JST Direct Engine</span>
-            </div>
-            <div>
-                <a href="https://www.nict.go.jp/JST/JST5.html" target="_blank" rel="noopener" class="hover:text-slate-300 underline">NICT JST Clock ↗</a>
-            </div>
+        <div class="status-bar">
+            <span>JST Field Engine · 0.1s Precision</span>
+            <span>Zero External CDN Fail-Safe</span>
         </div>
     </footer>
 
+    <!-- Pure Fail-safe JavaScript -->
     <script>
-        let isRedMode = true;
+        (function() {
+            // Internal States
+            let isRedMode = true;
+            let currentScale = 1.0;
+            let wakeLockObj = null;
 
-        function toggleColorMode() {
-            isRedMode = !isRedMode;
-            applyInitialColor();
-        }
+            // DOM Elements
+            const timeMain = document.getElementById('time-main');
+            const timeDot = document.getElementById('time-dot');
+            const timeMs = document.getElementById('time-ms');
+            const jstDate = document.getElementById('jst-date');
+            const clockCard = document.getElementById('clock-card');
+            const errorBanner = document.getElementById('error-banner');
 
-        function applyInitialColor() {
-            const hours = document.getElementById('clock-hours');
-            const minutes = document.getElementById('clock-minutes');
-            const seconds = document.getElementById('clock-seconds');
-            const colorIndicator = document.getElementById('color-indicator');
-            const colorText = document.getElementById('color-text');
-            const targets = [hours, minutes, seconds];
-            
-            targets.forEach(el => {
-                if (isRedMode) {
-                    el.classList.add('text-red-glow');
-                    el.classList.remove('text-white-glow');
-                } else {
-                    el.classList.add('text-white-glow');
-                    el.classList.remove('text-red-glow');
-                }
-            });
+            const btnColor = document.getElementById('btn-color');
+            const txtColor = document.getElementById('txt-color');
+            const btnUp = document.getElementById('btn-up');
+            const btnDown = document.getElementById('btn-down');
+            const btnWake = document.getElementById('btn-wake');
+            const txtWake = document.getElementById('txt-wake');
+            const btnFull = document.getElementById('btn-full');
 
-            if (colorIndicator && colorText) {
-                if (isRedMode) {
-                    colorIndicator.className = "w-3 h-3 rounded-full bg-red-500 inline-block";
-                    colorText.textContent = "레드 모드";
-                } else {
-                    colorIndicator.className = "w-3 h-3 rounded-full bg-white inline-block";
-                    colorText.textContent = "화이트 모드";
-                }
-            }
-        }
-
-        let currentScale = 1.0;
-        function adjustFontSize(delta) {
-            currentScale += delta * 0.05;
-            if (currentScale < 0.6) currentScale = 0.6;
-            if (currentScale > 1.8) currentScale = 1.8;
-
-            const hours = document.getElementById('clock-hours');
-            const minutes = document.getElementById('clock-minutes');
-            const seconds = document.getElementById('clock-seconds');
-
-            [hours, minutes, seconds].forEach(el => {
-                el.style.transform = `scale(${currentScale})`;
-                el.style.display = 'inline-block';
-            });
-        }
-
-        let wakeLock = null;
-        async function toggleWakeLock() {
-            if ('wakeLock' in navigator) {
+            // 100% Fail-Safe Clock Calculation using Pure Math
+            function tick() {
                 try {
-                    if (wakeLock === null) {
-                        wakeLock = await navigator.wakeLock.request('screen');
-                        document.getElementById('wakelock-status').textContent = 'ON';
-                        document.getElementById('wakelock-status').className = 'text-emerald-400 font-bold';
-                        wakeLock.addEventListener('release', () => {
-                            wakeLock = null;
-                            document.getElementById('wakelock-status').textContent = 'OFF';
-                            document.getElementById('wakelock-status').className = 'text-red-400';
-                        });
-                    } else {
-                        await wakeLock.release();
-                        wakeLock = null;
-                        document.getElementById('wakelock-status').textContent = 'OFF';
-                        document.getElementById('wakelock-status').className = 'text-red-400';
-                    }
-                } catch (err) {
-                    alert('화면 유지(Wake Lock)를 활성화할 수 없습니다.');
-                }
-            } else {
-                alert('이 브라우저는 화면 유지 기능을 지원하지 않습니다.');
-            }
-        }
-
-        function toggleFullScreen() {
-            if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen().catch(err => {
-                    console.log(err);
-                });
-            } else {
-                if (document.exitFullscreen) {
-                    document.exitFullscreen();
-                }
-            }
-        }
-
-        async function fetchTokyoWeather() {
-            try {
-                const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=35.6762&longitude=139.6503&current=temperature_2m,weather_code');
-                const data = await res.json();
-                if (data && data.current) {
-                    const temp = Math.round(data.current.temperature_2m);
-                    const code = data.current.weather_code;
-                    let weatherDesc = "맑음";
-                    if (code >= 1 && code <= 3) weatherDesc = "구름";
-                    else if (code >= 51 && code <= 67) weatherDesc = "비";
-                    else if (code >= 71 && code <= 77) weatherDesc = "눈";
-                    else if (code >= 95) weatherDesc = "뇌우";
+                    const now = new Date();
                     
-                    document.getElementById('tokyo-weather').textContent = `도쿄 ${temp}°C (${weatherDesc})`;
+                    // Convert local time to UTC in ms, then add 9 hours (+9 * 3600000 ms)
+                    const utcMs = now.getTime() + (now.getTimezoneOffset() * 60000);
+                    const jstMs = utcMs + (9 * 3600000);
+                    const jst = new Date(jstMs);
+
+                    // Extract Parts
+                    const h = String(jst.getHours()).padStart(2, '0');
+                    const m = String(jst.getMinutes()).padStart(2, '0');
+                    const s = String(jst.getSeconds()).padStart(2, '0');
+                    const ms1 = Math.floor(now.getMilliseconds() / 100);
+
+                    // Update Clock Text
+                    timeMain.textContent = h + ':' + m + ':' + s;
+                    timeMs.textContent = ms1;
+
+                    // Date String
+                    const year = jst.getFullYear();
+                    const month = String(jst.getMonth() + 1).padStart(2, '0');
+                    const date = String(jst.getDate()).padStart(2, '0');
+                    const days = ['일', '월', '화', '수', '목', '금', '토'];
+                    const day = days[jst.getDay()];
+
+                    jstDate.textContent = year + '.' + month + '.' + date + ' (' + day + ')';
+                } catch (err) {
+                    if (errorBanner) errorBanner.style.display = 'block';
                 }
-            } catch (e) {
-                document.getElementById('tokyo-weather').textContent = `도쿄 날씨 정보 없음`;
             }
-        }
 
-        // 100% Fail-safe JST Time calculation using UTC offset
-        function updateClock() {
-            try {
-                const now = new Date();
-                // Get UTC time in milliseconds and add JST offset (+9 hours)
-                const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
-                const jst = new Date(utc + (3600000 * 9));
+            // High Contrast Color Switcher
+            function toggleColor() {
+                isRedMode = !isRedMode;
+                const elements = [timeMain, timeDot, timeMs];
 
-                const h = String(jst.getHours()).padStart(2, '0');
-                const m = String(jst.getMinutes()).padStart(2, '0');
-                const s = String(jst.getSeconds()).padStart(2, '0');
-                const ms = Math.floor(now.getMilliseconds() / 100);
+                elements.forEach(el => {
+                    if (isRedMode) {
+                        el.classList.remove('color-white');
+                        el.classList.add('color-red');
+                    } else {
+                        el.classList.remove('color-red');
+                        el.classList.add('color-white');
+                    }
+                });
 
-                document.getElementById('clock-hours').textContent = h;
-                document.getElementById('clock-minutes').textContent = m;
-                document.getElementById('clock-seconds').textContent = s;
-                document.getElementById('clock-millis').textContent = ms;
-
-                // Date formatting
-                const years = jst.getFullYear();
-                const months = String(jst.getMonth() + 1).padStart(2, '0');
-                const days = String(jst.getDate()).padStart(2, '0');
-                const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
-                const weekday = weekdays[jst.getDay()];
-
-                document.getElementById('jst-date').textContent = `${years}.${months}.${days} (${weekday})`;
-            } catch (err) {
-                console.error("Clock update error:", err);
+                txtColor.textContent = isRedMode ? 'RED 모드' : 'WHITE 모드';
             }
-        }
 
-        applyInitialColor();
-        updateClock();
-        setInterval(updateClock, 50);
-        fetchTokyoWeather();
-        setInterval(fetchTokyoWeather,
+            // Font Resizing (+ / -)
+            function resizeFont(delta) {
+                currentScale += delta;
+                if (currentScale < 0.6) currentScale = 0.6;
+                if (currentScale > 1.8) currentScale = 1.8;
+                clockCard.style.transform = 'scale(' + currentScale + ')';
+            }
+
+            // Screen Wake Lock API for iPad / iPhone
+            async function toggleWakeLock() {
+                if ('wakeLock' in navigator) {
+                    try {
+                        if (!wakeLockObj) {
+                            wakeLockObj = await navigator.wakeLock.request('screen');
+                            txtWake.textContent = 'ON';
+                            txtWake.style.color = '#22c55e';
+                            btnWake.classList.add('btn-active');
+
+                            wakeLockObj.addEventListener('release', () => {
+                                wakeLockObj = null;
+                                txtWake.textContent = 'OFF';
+                                txtWake.style.color = '#ef4444';
+                                btnWake.classList.remove('btn-active');
+                            });
+                        } else {
+                            await wakeLockObj.release();
+                            wakeLockObj = null;
+                        }
+                    } catch (e) {
+                        alert('화면 유지를 켤 수 없습니다.');
+                    }
+                } else {
+                    alert('브라우저 설정에서 자동 잠금을 꺼주세요.');
+                }
+            }
+
+            // Fullscreen
+            function toggleFullscreen() {
+                if (!document.fullscreenElement) {
+                    document.documentElement.requestFullscreen().catch(() => {});
+                } else {
+                    if (document.exitFullscreen) document.exitFullscreen();
+                }
+            }
+
+            // Event Listeners
+            btnColor.addEventListener('click', toggleColor);
+            btnUp.addEventListener('click', () => resizeFont(0.1));
+            btnDown.addEventListener('click', () => resizeFont(-0.1));
+            btnWake.addEventListener('click', toggleWakeLock);
+            btnFull.addEventListener('click', toggleFullscreen);
+
+            // Re-apply wake lock on tab switch
+            document.addEventListener('visibilitychange', async () => {
+                if (wakeLockObj !== null && document.visibilityState === 'visible') {
+                    try {
+                        wakeLockObj = await navigator.wakeLock.request('screen');
+                    } catch (e) {}
+                }
+            });
+
+            // Start High-speed 50ms Render Loop
+            tick();
+            setInterval(tick, 50);
+        })();
+    </script>
+</body>
+</html>
