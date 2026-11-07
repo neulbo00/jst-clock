@@ -118,26 +118,45 @@
       body.field-mode .clock { font-size:clamp(38px,min(10vw,20vh),200px); }
     }
     @media (orientation:portrait) {
-      body { display:block; min-height:100svh; padding:0; }
-      body > *:not(.rotate-notice) { display:none !important; }
-      .rotate-notice {
-        min-height:100svh; display:flex; flex-direction:column;
-        align-items:center; justify-content:center; gap:12px;
-        padding:24px; background:#050505; color:#eee; text-align:center;
+      body {
+        min-height:100svh; padding: max(14px,env(safe-area-inset-top)) 14px max(14px,env(safe-area-inset-bottom));
+        display:flex; flex-direction:column;
       }
-      .rotate-icon { color:#ff3030; font:700 52px/1 "Orbitron",sans-serif; }
-      .rotate-title { font:700 18px/1.4 "Noto Sans KR",sans-serif; }
-      .rotate-sub { color:#777; font:500 10px/1.4 "JetBrains Mono",monospace; letter-spacing:.12em; }
+      .topbar { flex:0 0 auto; align-items:center; }
+      .topbar .date { display:block; font-size:11px; }
+      .weather {
+        position:static; width:100%; max-width:100%; margin:16px auto 0;
+        padding:12px; border:1px solid var(--line); background:#0a0a0a;
+        justify-content:space-between;
+      }
+      .weather-reading { gap:8px; }
+      .weather-temp { font-size:clamp(20px,6vw,28px); }
+      .weather-desc { font-size:12px; }
+      .weather-extra { font-size:10px; }
+      .weather button { min-height:40px; padding:0 10px; font-size:11px; }
+      main { flex:1 1 auto; min-height:180px; padding:18px 0; }
+      .clock-panel { width:100%; max-width:100%; padding:clamp(22px,5vh,48px) 4px; overflow:hidden; }
+      .clock-label { margin-bottom:clamp(16px,4vh,32px); }
+      .clock {
+        width:100%; max-width:100%; justify-content:center;
+        font-size:clamp(30px,9.2vw,58px);
+        letter-spacing:-.035em; transform:scale(var(--scale));
+      }
+      .digit { flex:0 0 2ch; width:2ch; }
+      .separator { flex:0 0 .48ch; width:.48ch; }
+      .tenths { flex:0 0 .62ch; width:.62ch; }
+      .subline { margin-top:clamp(16px,4vh,30px); }
+      .controls { flex:0 0 auto; margin:0 auto 14px; gap:8px; }
+      .controls button { min-height:42px; flex:1 1 calc(50% - 8px); }
+      .bottombar { flex:0 0 auto; font-size:9px; }
+      body.field-mode { padding: max(10px,env(safe-area-inset-top)) 10px max(10px,env(safe-area-inset-bottom)); }
+      body.field-mode .clock-panel { padding:0; }
+      body.field-mode .clock { font-size:clamp(32px,10vw,64px); }
     }
     @media (prefers-reduced-motion:reduce) { *,*::before,*::after { transition:none !important; } }
   </style>
 </head>
 <body>
-  <div class="rotate-notice" role="status">
-    <div class="rotate-icon">↻</div>
-    <div class="rotate-title">가로 화면으로 돌려주세요</div>
-    <div class="rotate-sub">neulbo CLOCK · LANDSCAPE MODE</div>
-  </div>
   <header class="topbar">
     <div><div class="brand">neulbo CLOCK</div><div class="zone">JAPAN STANDARD TIME · UTC+9</div></div>
     <div id="jst-date" class="date" aria-label="Japan Standard Time date">----</div>
