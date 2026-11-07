@@ -12,7 +12,7 @@
     el.hours.textContent = p.hour;
     el.minutes.textContent = p.minute;
     el.seconds.textContent = p.second;
-    el.milliseconds.textContent = String(Math.floor(now.getMilliseconds() / 100));
+    el.milliseconds.textContent = '.' + String(Math.floor(now.getMilliseconds() / 100));
     el.date.textContent = formatter.format(now).replaceAll('/', '.');
     el.weekday.textContent = weekdayFormatter.format(now).toUpperCase();
     requestAnimationFrame(render);
