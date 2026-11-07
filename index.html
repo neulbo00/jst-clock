@@ -7,7 +7,7 @@
   <title>neulbo CLOCK | JST Field Clock</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600;700;800&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600;700;800&family=Noto+Sans+KR:wght@400;500;600;700&family=Orbitron:wght@500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root { color-scheme: dark; --bg:#050505; --panel:#0b0b0b; --line:#242424; --digits:#ff3030; --scale:1; }
     * { box-sizing:border-box; }
@@ -40,9 +40,9 @@
     .clock-label { margin-bottom:clamp(20px,4vw,48px); color:#666; font:600 11px/1 "JetBrains Mono",monospace; letter-spacing:.22em; }
     .clock {
       display:flex; align-items:baseline; justify-content:center; white-space:nowrap;
-      font-family:"JetBrains Mono",ui-monospace,monospace; font-size:clamp(39px,13.2vw,190px);
+      font-family:"Orbitron","JetBrains Mono",ui-monospace,monospace; font-size:clamp(39px,13.2vw,190px);
       font-weight:700; line-height:1; font-variant-numeric:tabular-nums lining-nums;
-      letter-spacing:-.075em; transform:scale(var(--scale)); transform-origin:center;
+      letter-spacing:-.055em; transform:scale(var(--scale)); transform-origin:center;
     }
     .digit { display:inline-block; flex:0 0 2ch; width:2ch; color:var(--digits); text-align:center; text-shadow:0 0 18px color-mix(in srgb,var(--digits) 22%,transparent); }
     .separator { display:inline-block; width:.58ch; color:#555; font-weight:500; text-align:center; letter-spacing:0; }
@@ -57,7 +57,14 @@
     .bottombar a { color:#777; text-decoration:none; }
     .bottombar a:hover { color:#ddd; }
     body.field-mode { padding:10px; }
-    body.field-mode .topbar, body.field-mode .weather, body.field-mode .controls, body.field-mode .bottombar, body.field-mode .clock-label, body.field-mode .subline { display:none; }
+    body.field-mode .topbar, body.field-mode .weather, body.field-mode .bottombar, body.field-mode .clock-label, body.field-mode .subline { display:none; }
+    body.field-mode .controls {
+      position:fixed; right:12px; bottom:max(12px,env(safe-area-inset-bottom));
+      width:auto; margin:0; z-index:20;
+    }
+    body.field-mode .controls button:not(#fieldBtn) { display:none; }
+    body.field-mode #fieldBtn { opacity:.72; min-height:40px; padding:0 12px; }
+    body.field-mode #fieldBtn:active, body.field-mode #fieldBtn:focus-visible { opacity:1; }
     body.field-mode main { padding:0; }
     body.field-mode .clock-panel { border:0; background:transparent; padding:10px 0; }
     @media (max-width:600px) {
@@ -72,10 +79,57 @@
       .controls { gap:8px; }
       .controls button { flex:1 1 calc(50% - 8px); padding-inline:8px; }
     }
+    .rotate-notice { display:none; }
+    @media (orientation:landscape) {
+      body {
+        min-height:100vh; min-height:100svh;
+        padding:clamp(12px,2.2vw,30px) clamp(20px,4vw,64px);
+        display:flex; flex-direction:column;
+      }
+      .topbar { flex:0 0 auto; }
+      .weather {
+        position:absolute; top:clamp(12px,2.2vw,30px); right:clamp(20px,4vw,64px);
+        width:auto; max-width:42vw; margin:0; padding:7px 12px;
+        border:0; background:transparent; justify-content:flex-end;
+      }
+      .weather-place { text-align:right; margin-bottom:2px; }
+      .weather-reading { justify-content:flex-end; gap:8px; }
+      .weather-temp { font-size:clamp(18px,2.2vw,26px); }
+      .weather-desc { font-size:11px; }
+      .weather-extra { margin-top:3px; text-align:right; font-size:10px; }
+      .weather button { min-height:34px; padding:0 10px; font-size:10px; }
+      main { min-height:0; padding:0 0 8px; }
+      .clock-panel { width:100%; padding:clamp(10px,2vh,22px) 12px; }
+      .clock-label { margin-bottom:clamp(8px,2vh,20px); }
+      .clock { font-size:clamp(64px,18.5vw,250px); }
+      .subline { margin-top:clamp(10px,2vh,22px); }
+      .controls { flex:0 0 auto; margin:0 auto 10px; }
+      .controls button { min-height:38px; }
+      .bottombar { flex:0 0 auto; }
+      body.field-mode { padding:8px 18px; }
+      body.field-mode .clock { font-size:clamp(72px,20vw,280px); }
+    }
+    @media (orientation:portrait) {
+      body { display:block; min-height:100svh; padding:0; }
+      body > *:not(.rotate-notice) { display:none !important; }
+      .rotate-notice {
+        min-height:100svh; display:flex; flex-direction:column;
+        align-items:center; justify-content:center; gap:12px;
+        padding:24px; background:#050505; color:#eee; text-align:center;
+      }
+      .rotate-icon { color:#ff3030; font:700 52px/1 "Orbitron",sans-serif; }
+      .rotate-title { font:700 18px/1.4 "Noto Sans KR",sans-serif; }
+      .rotate-sub { color:#777; font:500 10px/1.4 "JetBrains Mono",monospace; letter-spacing:.12em; }
+    }
     @media (prefers-reduced-motion:reduce) { *,*::before,*::after { transition:none !important; } }
   </style>
 </head>
 <body>
+  <div class="rotate-notice" role="status">
+    <div class="rotate-icon">↻</div>
+    <div class="rotate-title">가로 화면으로 돌려주세요</div>
+    <div class="rotate-sub">neulbo CLOCK · LANDSCAPE MODE</div>
+  </div>
   <header class="topbar">
     <div><div class="brand">neulbo CLOCK</div><div class="zone">JAPAN STANDARD TIME · UTC+9</div></div>
     <div id="jst-date" class="date" aria-label="Japan Standard Time date">----</div>
