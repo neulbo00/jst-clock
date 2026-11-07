@@ -7,7 +7,7 @@
   <title>neulbo CLOCK | JST Field Clock</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600;700;800&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@500;600;700;800&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root { color-scheme: dark; --bg:#050505; --panel:#0b0b0b; --line:#242424; --digits:#ff3030; --scale:1; }
     * { box-sizing:border-box; }
@@ -20,9 +20,9 @@
       font-family:"Noto Sans KR",sans-serif; user-select:none; -webkit-user-select:none;
     }
     .topbar, .bottombar { width:min(100%,1500px); margin-inline:auto; display:flex; align-items:center; justify-content:space-between; gap:16px; }
-    .brand { font:700 14px/1 "JetBrains Mono",monospace; letter-spacing:.16em; color:#eee; white-space:nowrap; }
-    .zone { margin-top:8px; color:#888; font:500 11px/1.4 "JetBrains Mono",monospace; letter-spacing:.12em; }
-    .date { color:#bdbdbd; font:600 clamp(12px,1.5vw,16px)/1.4 "JetBrains Mono",monospace; text-align:right; font-variant-numeric:tabular-nums; }
+    .brand { font:700 14px/1 "Roboto Mono",monospace; letter-spacing:.16em; color:#eee; white-space:nowrap; }
+    .zone { margin-top:8px; color:#888; font:500 11px/1.4 "Roboto Mono",monospace; letter-spacing:.12em; }
+    .date { color:#bdbdbd; font:600 clamp(12px,1.5vw,16px)/1.4 "Roboto Mono",monospace; text-align:right; font-variant-numeric:tabular-nums; }
     .weather {
       width:min(100%,1500px); margin:clamp(18px,3vh,30px) auto 0; padding:14px 18px;
       display:flex; align-items:center; justify-content:space-between; gap:14px;
@@ -31,29 +31,29 @@
     .weather-main { min-width:0; }
     .weather-place { color:#888; font-size:11px; margin-bottom:5px; }
     .weather-reading { display:flex; align-items:baseline; flex-wrap:wrap; gap:10px; }
-    .weather-temp { color:#f0f0f0; font:600 clamp(22px,4vw,32px)/1 "JetBrains Mono",monospace; }
+    .weather-temp { color:#f0f0f0; font:600 clamp(22px,4vw,32px)/1 "Roboto Mono",monospace; }
     .weather-desc { color:#bbb; font-size:13px; }
-    .weather-extra { color:#777; font:500 11px/1.6 "JetBrains Mono",monospace; margin-top:7px; }
+    .weather-extra { color:#777; font:500 11px/1.6 "Roboto Mono",monospace; margin-top:7px; }
     .weather button { flex:0 0 auto; }
     main { flex:1; width:100%; display:flex; align-items:center; justify-content:center; padding-block:4vh; }
     .clock-panel { width:min(100%,1500px); padding:clamp(24px,5vw,72px) clamp(8px,3vw,44px); background:var(--panel); border:1px solid var(--line); border-radius:12px; text-align:center; }
-    .clock-label { margin-bottom:clamp(20px,4vw,48px); color:#666; font:600 11px/1 "JetBrains Mono",monospace; letter-spacing:.22em; }
+    .clock-label { margin-bottom:clamp(20px,4vw,48px); color:#666; font:600 11px/1 "Roboto Mono",monospace; letter-spacing:.22em; }
     .clock {
       display:flex; align-items:baseline; justify-content:center; white-space:nowrap;
-      font-family:"JetBrains Mono",ui-monospace,monospace; font-size:clamp(39px,13.2vw,190px);
+      font-family:"Roboto Mono",ui-monospace,monospace; font-size:clamp(39px,13.2vw,190px);
       font-weight:700; line-height:1; font-variant-numeric:tabular-nums lining-nums;
       letter-spacing:-.035em; transform:scale(var(--scale)); transform-origin:center;
     }
     .digit { display:inline-block; flex:0 0 2ch; width:2ch; color:var(--digits); text-align:center; text-shadow:0 0 18px color-mix(in srgb,var(--digits) 22%,transparent); }
     .separator { display:inline-block; width:.58ch; color:#555; font-weight:500; text-align:center; letter-spacing:0; }
     .tenths { display:inline-block; width:.72ch; margin-left:.04ch; color:var(--digits); font-size:.55em; font-weight:600; text-align:left; letter-spacing:0; }
-    .subline { margin-top:clamp(24px,4vw,46px); color:#666; font:500 11px/1.5 "JetBrains Mono",monospace; letter-spacing:.12em; }
+    .subline { margin-top:clamp(24px,4vw,46px); color:#666; font:500 11px/1.5 "Roboto Mono",monospace; letter-spacing:.12em; }
     .controls { width:min(100%,900px); margin:0 auto 22px; display:flex; flex-wrap:wrap; justify-content:center; gap:10px; }
     button { min-height:44px; padding:0 18px; border:1px solid #303030; border-radius:6px; background:#111; color:#ddd; font:600 12px "Noto Sans KR",sans-serif; cursor:pointer; touch-action:manipulation; }
     button:hover { background:#1b1b1b; border-color:#555; }
     button:focus-visible { outline:2px solid #aaa; outline-offset:3px; }
     button[aria-pressed="true"] { border-color:#777; background:#202020; }
-    .bottombar { color:#555; font:500 10px/1.5 "JetBrains Mono",monospace; letter-spacing:.06em; }
+    .bottombar { color:#555; font:500 10px/1.5 "Roboto Mono",monospace; letter-spacing:.06em; }
     .bottombar a { color:#777; text-decoration:none; }
     .bottombar a:hover { color:#ddd; }
     body.field-mode { padding:10px; }
