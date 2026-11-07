@@ -2,179 +2,93 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#050505">
   <title>neulbo CLOCK | JST Field Clock</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600;700;800&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    :root {
-      color-scheme: dark;
-      --bg: #050505;
-      --panel: #0b0b0b;
-      --line: #242424;
-      --muted: #777;
-      --digits: #ff3030;
-      --scale: 1;
-    }
-    * { box-sizing: border-box; }
-    html, body { min-height: 100%; margin: 0; }
+    :root { color-scheme: dark; --bg:#050505; --panel:#0b0b0b; --line:#242424; --digits:#ff3030; --scale:1; }
+    * { box-sizing:border-box; }
+    html, body { min-height:100%; margin:0; }
     body {
-      min-height: 100svh;
-      padding: clamp(16px, 3vw, 36px);
-      display: flex;
-      flex-direction: column;
-      background: var(--bg);
-      color: #eee;
-      font-family: "Noto Sans KR", sans-serif;
-      user-select: none;
-      -webkit-user-select: none;
+      min-height:100vh; min-height:100svh; padding:clamp(14px,3vw,36px);
+      padding-top:max(clamp(14px,3vw,36px), env(safe-area-inset-top));
+      padding-bottom:max(clamp(14px,3vw,36px), env(safe-area-inset-bottom));
+      display:flex; flex-direction:column; background:var(--bg); color:#eee;
+      font-family:"Noto Sans KR",sans-serif; user-select:none; -webkit-user-select:none;
     }
-    .topbar, .bottombar {
-      width: min(100%, 1500px);
-      margin-inline: auto;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
+    .topbar, .bottombar { width:min(100%,1500px); margin-inline:auto; display:flex; align-items:center; justify-content:space-between; gap:16px; }
+    .brand { font:700 14px/1 "JetBrains Mono",monospace; letter-spacing:.16em; color:#eee; white-space:nowrap; }
+    .zone { margin-top:8px; color:#888; font:500 11px/1.4 "JetBrains Mono",monospace; letter-spacing:.12em; }
+    .date { color:#bdbdbd; font:600 clamp(12px,1.5vw,16px)/1.4 "JetBrains Mono",monospace; text-align:right; font-variant-numeric:tabular-nums; }
+    .weather {
+      width:min(100%,1500px); margin:clamp(18px,3vh,30px) auto 0; padding:14px 18px;
+      display:flex; align-items:center; justify-content:space-between; gap:14px;
+      border:1px solid var(--line); border-radius:9px; background:#0a0a0a;
     }
-    .brand {
-      font: 700 14px/1 "JetBrains Mono", monospace;
-      letter-spacing: .16em;
-      color: #eee;
-      white-space: nowrap;
-    }
-    .zone {
-      margin-top: 8px;
-      color: #888;
-      font: 500 11px/1.4 "JetBrains Mono", monospace;
-      letter-spacing: .12em;
-    }
-    .date {
-      color: #bdbdbd;
-      font: 600 clamp(12px, 1.5vw, 16px)/1.4 "JetBrains Mono", monospace;
-      text-align: right;
-      font-variant-numeric: tabular-nums;
-    }
-    main {
-      flex: 1;
-      width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding-block: 5vh;
-    }
-    .clock-panel {
-      width: min(100%, 1500px);
-      padding: clamp(24px, 5vw, 72px) clamp(12px, 3vw, 44px);
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      text-align: center;
-    }
-    .clock-label {
-      margin-bottom: clamp(20px, 4vw, 48px);
-      color: #666;
-      font: 600 11px/1 "JetBrains Mono", monospace;
-      letter-spacing: .22em;
-    }
+    .weather-main { min-width:0; }
+    .weather-place { color:#888; font-size:11px; margin-bottom:5px; }
+    .weather-reading { display:flex; align-items:baseline; flex-wrap:wrap; gap:10px; }
+    .weather-temp { color:#f0f0f0; font:600 clamp(22px,4vw,32px)/1 "JetBrains Mono",monospace; }
+    .weather-desc { color:#bbb; font-size:13px; }
+    .weather-extra { color:#777; font:500 11px/1.6 "JetBrains Mono",monospace; margin-top:7px; }
+    .weather button { flex:0 0 auto; }
+    main { flex:1; width:100%; display:flex; align-items:center; justify-content:center; padding-block:4vh; }
+    .clock-panel { width:min(100%,1500px); padding:clamp(24px,5vw,72px) clamp(8px,3vw,44px); background:var(--panel); border:1px solid var(--line); border-radius:12px; text-align:center; }
+    .clock-label { margin-bottom:clamp(20px,4vw,48px); color:#666; font:600 11px/1 "JetBrains Mono",monospace; letter-spacing:.22em; }
     .clock {
-      display: flex;
-      align-items: baseline;
-      justify-content: center;
-      white-space: nowrap;
-      font-family: "JetBrains Mono", ui-monospace, monospace;
-      font-size: clamp(42px, 13.2vw, 190px);
-      font-weight: 700;
-      line-height: 1;
-      font-variant-numeric: tabular-nums lining-nums;
-      letter-spacing: -.075em;
-      transform: scale(var(--scale));
-      transform-origin: center;
+      display:flex; align-items:baseline; justify-content:center; white-space:nowrap;
+      font-family:"JetBrains Mono",ui-monospace,monospace; font-size:clamp(39px,13.2vw,190px);
+      font-weight:700; line-height:1; font-variant-numeric:tabular-nums lining-nums;
+      letter-spacing:-.075em; transform:scale(var(--scale)); transform-origin:center;
     }
-    .digit {
-      display: inline-block;
-      flex: 0 0 2ch;
-      width: 2ch;
-      color: var(--digits);
-      text-shadow: 0 0 18px color-mix(in srgb, var(--digits) 22%, transparent);
-      text-align: center;
+    .digit { display:inline-block; flex:0 0 2ch; width:2ch; color:var(--digits); text-align:center; text-shadow:0 0 18px color-mix(in srgb,var(--digits) 22%,transparent); }
+    .separator { display:inline-block; width:.58ch; color:#555; font-weight:500; text-align:center; letter-spacing:0; }
+    .tenths { display:inline-block; width:.72ch; margin-left:.04ch; color:var(--digits); font-size:.55em; font-weight:600; text-align:left; letter-spacing:0; }
+    .subline { margin-top:clamp(24px,4vw,46px); color:#666; font:500 11px/1.5 "JetBrains Mono",monospace; letter-spacing:.12em; }
+    .controls { width:min(100%,900px); margin:0 auto 22px; display:flex; flex-wrap:wrap; justify-content:center; gap:10px; }
+    button { min-height:44px; padding:0 18px; border:1px solid #303030; border-radius:6px; background:#111; color:#ddd; font:600 12px "Noto Sans KR",sans-serif; cursor:pointer; touch-action:manipulation; }
+    button:hover { background:#1b1b1b; border-color:#555; }
+    button:focus-visible { outline:2px solid #aaa; outline-offset:3px; }
+    button[aria-pressed="true"] { border-color:#777; background:#202020; }
+    .bottombar { color:#555; font:500 10px/1.5 "JetBrains Mono",monospace; letter-spacing:.06em; }
+    .bottombar a { color:#777; text-decoration:none; }
+    .bottombar a:hover { color:#ddd; }
+    body.field-mode { padding:10px; }
+    body.field-mode .topbar, body.field-mode .weather, body.field-mode .controls, body.field-mode .bottombar, body.field-mode .clock-label, body.field-mode .subline { display:none; }
+    body.field-mode main { padding:0; }
+    body.field-mode .clock-panel { border:0; background:transparent; padding:10px 0; }
+    @media (max-width:600px) {
+      body { padding-left:12px; padding-right:12px; }
+      .topbar { align-items:flex-start; }
+      .weather { padding:12px; }
+      .weather button { min-height:42px; padding:0 12px; }
+      .clock-panel { border-radius:8px; padding-inline:2px; }
+      .clock { font-size:clamp(34px,12.5vw,72px); letter-spacing:-.09em; }
+      .digit { flex-basis:2ch; width:2ch; }
+      .separator { width:.48ch; }
+      .controls { gap:8px; }
+      .controls button { flex:1 1 calc(50% - 8px); padding-inline:8px; }
     }
-    .separator {
-      display: inline-block;
-      width: .58ch;
-      color: #555;
-      font-weight: 500;
-      text-align: center;
-      letter-spacing: 0;
-    }
-    .tenths {
-      display: inline-block;
-      width: .72ch;
-      margin-left: .04ch;
-      color: var(--digits);
-      font-size: .55em;
-      font-weight: 600;
-      text-align: left;
-      letter-spacing: 0;
-    }
-    .subline {
-      margin-top: clamp(24px, 4vw, 46px);
-      color: #666;
-      font: 500 11px/1.5 "JetBrains Mono", monospace;
-      letter-spacing: .12em;
-    }
-    .controls {
-      width: min(100%, 900px);
-      margin: 0 auto 22px;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 10px;
-    }
-    button {
-      min-height: 44px;
-      padding: 0 18px;
-      border: 1px solid #303030;
-      border-radius: 6px;
-      background: #111;
-      color: #ddd;
-      font: 600 12px "Noto Sans KR", sans-serif;
-      cursor: pointer;
-      transition: background .15s, border-color .15s;
-    }
-    button:hover { background: #1b1b1b; border-color: #555; }
-    button:focus-visible { outline: 2px solid #aaa; outline-offset: 3px; }
-    button[aria-pressed="true"] { border-color: #777; background: #202020; }
-    .bottombar {
-      color: #555;
-      font: 500 10px/1.5 "JetBrains Mono", monospace;
-      letter-spacing: .06em;
-    }
-    .bottombar a { color: #777; text-decoration: none; }
-    .bottombar a:hover { color: #ddd; }
-    @media (max-width: 560px) {
-      body { padding: 16px 12px; }
-      .topbar { align-items: flex-start; }
-      .clock-panel { border-radius: 8px; padding-inline: 4px; }
-      .clock { font-size: clamp(36px, 12.8vw, 72px); letter-spacing: -.09em; }
-      .digit { flex-basis: 2ch; width: 2ch; }
-      .separator { width: .48ch; }
-      .controls { gap: 8px; }
-      button { flex: 1 1 calc(50% - 8px); padding-inline: 8px; }
-    }
-    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; } }
+    @media (prefers-reduced-motion:reduce) { *,*::before,*::after { transition:none !important; } }
   </style>
 </head>
 <body>
   <header class="topbar">
-    <div>
-      <div class="brand">neulbo CLOCK</div>
-      <div class="zone">JAPAN STANDARD TIME · UTC+9</div>
-    </div>
+    <div><div class="brand">neulbo CLOCK</div><div class="zone">JAPAN STANDARD TIME · UTC+9</div></div>
     <div id="jst-date" class="date" aria-label="Japan Standard Time date">----</div>
   </header>
+
+  <section class="weather" aria-label="현장 날씨">
+    <div class="weather-main">
+      <div id="weather-place" class="weather-place">도쿄 · 기본 위치</div>
+      <div class="weather-reading"><span id="weather-temp" class="weather-temp">--°</span><span id="weather-desc" class="weather-desc">날씨 정보 불러오는 중</span></div>
+      <div id="weather-extra" class="weather-extra">체감 --° · 습도 --% · 바람 -- km/h</div>
+    </div>
+    <button id="locationBtn" type="button">내 위치 날씨</button>
+  </section>
 
   <main>
     <section class="clock-panel" aria-label="Japan Standard Time clock">
@@ -190,8 +104,7 @@
     <button id="colorBtn" type="button" aria-pressed="true">RED / WHITE</button>
     <button id="smallerBtn" type="button" aria-label="Decrease clock size">글자 작게 −</button>
     <button id="largerBtn" type="button" aria-label="Increase clock size">글자 크게 +</button>
-    <button id="wakeBtn" type="button" aria-pressed="false">화면 유지 OFF</button>
-    <button id="fullBtn" type="button">전체 화면</button>
+    <button id="fieldBtn" type="button" aria-pressed="false">현장 모드</button>
   </nav>
 
   <footer class="bottombar">
@@ -201,104 +114,126 @@
 
   <script>
     (() => {
-      const $ = (id) => document.getElementById(id);
+      const $ = id => document.getElementById(id);
       const dateFormatter = new Intl.DateTimeFormat("ko-KR", {
-        timeZone: "Asia/Tokyo", year: "numeric", month: "2-digit",
-        day: "2-digit", weekday: "short"
+        timeZone:"Asia/Tokyo", year:"numeric", month:"2-digit", day:"2-digit", weekday:"short"
       });
       const timeFormatter = new Intl.DateTimeFormat("en-GB", {
-        timeZone: "Asia/Tokyo", hour: "2-digit", minute: "2-digit",
-        second: "2-digit", hourCycle: "h23"
+        timeZone:"Asia/Tokyo", hour:"2-digit", minute:"2-digit", second:"2-digit", hourCycle:"h23"
       });
-
+      const weatherDescriptions = {
+        0:"맑음", 1:"대체로 맑음", 2:"구름 조금", 3:"흐림",
+        45:"안개", 48:"짙은 안개", 51:"이슬비", 53:"이슬비", 55:"강한 이슬비",
+        56:"어는 이슬비", 57:"강한 어는 이슬비", 61:"약한 비", 63:"비", 65:"강한 비",
+        66:"어는 비", 67:"강한 어는 비", 71:"약한 눈", 73:"눈", 75:"강한 눈",
+        77:"싸락눈", 80:"소나기", 81:"강한 소나기", 82:"폭우성 소나기",
+        85:"눈 소나기", 86:"강한 눈 소나기", 95:"뇌우", 96:"우박 동반 뇌우", 99:"강한 뇌우"
+      };
       let scale = 1;
       let redMode = true;
-      let wakeLock = null;
-      let wakeRequested = false;
+      let weatherCoordinates = { latitude:35.6762, longitude:139.6503, label:"도쿄 · 기본 위치" };
 
       function renderClock() {
         const now = new Date();
-        const parts = Object.fromEntries(
-          timeFormatter.formatToParts(now).map(part => [part.type, part.value])
-        );
+        const parts = Object.fromEntries(timeFormatter.formatToParts(now).map(p => [p.type,p.value]));
         $("hh").textContent = parts.hour;
         $("mm").textContent = parts.minute;
         $("ss").textContent = parts.second;
-        $("tenth").textContent = Math.floor(now.getMilliseconds() / 100);
-        $("jst-date").textContent = dateFormatter.format(now).replaceAll("/", ".").replace(",", "");
-        const delay = 100 - (Date.now() % 100);
-        window.setTimeout(renderClock, delay);
+        $("tenth").textContent = Math.floor(now.getMilliseconds()/100);
+        $("jst-date").textContent = dateFormatter.format(now).replaceAll("/",".").replace(",","");
+        window.setTimeout(renderClock, 100-(Date.now()%100));
       }
 
-      function setWakeStatus(enabled) {
-        $("wakeBtn").textContent = enabled ? "화면 유지 ON" : "화면 유지 OFF";
-        $("wakeBtn").setAttribute("aria-pressed", String(enabled));
-      }
-
-      async function acquireWakeLock() {
-        if (!wakeRequested || !("wakeLock" in navigator) || document.visibilityState !== "visible") return;
+      async function loadWeather(latitude, longitude, label) {
+        $("weather-desc").textContent = "날씨 업데이트 중";
         try {
-          wakeLock = await navigator.wakeLock.request("screen");
-          wakeLock.addEventListener("release", () => {
-            wakeLock = null;
-            if (!wakeRequested) setWakeStatus(false);
-          }, { once: true });
+          const url = new URL("https://api.open-meteo.com/v1/forecast");
+          url.search = new URLSearchParams({
+            latitude:String(latitude), longitude:String(longitude),
+            current:"temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m",
+            timezone:"auto"
+          }).toString();
+          const response = await fetch(url.toString());
+          if (!response.ok) throw new Error("Weather request failed");
+          const data = await response.json();
+          const current = data.current;
+          if (!current) throw new Error("No current weather data");
+          $("weather-place").textContent = label;
+          $("weather-temp").textContent = Math.round(current.temperature_2m) + "°C";
+          $("weather-desc").textContent = weatherDescriptions[current.weather_code] || "날씨 정보";
+          $("weather-extra").textContent =
+            "체감 " + Math.round(current.apparent_temperature) + "° · 습도 " +
+            Math.round(current.relative_humidity_2m) + "% · 바람 " +
+            Math.round(current.wind_speed_10m) + " km/h";
+          $("clock-status").textContent = "WEATHER UPDATED · " + new Date().toLocaleTimeString("ko-KR",{hour:"2-digit",minute:"2-digit"});
         } catch {
-          wakeRequested = false;
-          setWakeStatus(false);
-          $("clock-status").textContent = "SCREEN WAKE LOCK UNAVAILABLE";
+          $("weather-desc").textContent = "날씨 정보를 가져오지 못했습니다";
+          $("weather-extra").textContent = "네트워크 연결을 확인해 주세요";
         }
       }
+
+      $("locationBtn").addEventListener("click", () => {
+        if (!navigator.geolocation) {
+          $("weather-desc").textContent = "이 브라우저는 위치 정보를 지원하지 않습니다";
+          return;
+        }
+        $("locationBtn").disabled = true;
+        $("locationBtn").textContent = "위치 확인 중";
+        navigator.geolocation.getCurrentPosition(
+          position => {
+            weatherCoordinates = {
+              latitude:position.coords.latitude,
+              longitude:position.coords.longitude,
+              label:"현재 위치 날씨"
+            };
+            loadWeather(weatherCoordinates.latitude,weatherCoordinates.longitude,weatherCoordinates.label)
+              .finally(() => { $("locationBtn").disabled = false; $("locationBtn").textContent = "위치 새로고침"; });
+          },
+          error => {
+            const messages = {
+              1:"위치 권한이 거부됐습니다. Safari 설정에서 허용해 주세요",
+              2:"현재 위치를 확인할 수 없습니다",
+              3:"위치 확인 시간이 초과됐습니다"
+            };
+            $("weather-desc").textContent = messages[error.code] || "위치 정보를 가져오지 못했습니다";
+            $("locationBtn").disabled = false;
+            $("locationBtn").textContent = "다시 시도";
+          },
+          { enableHighAccuracy:false, timeout:12000, maximumAge:300000 }
+        );
+      });
 
       $("colorBtn").addEventListener("click", () => {
         redMode = !redMode;
-        document.documentElement.style.setProperty("--digits", redMode ? "#ff3030" : "#f2f2f2");
-        $("colorBtn").setAttribute("aria-pressed", String(redMode));
+        document.documentElement.style.setProperty("--digits",redMode ? "#ff3030" : "#f2f2f2");
+        $("colorBtn").setAttribute("aria-pressed",String(redMode));
       });
       $("smallerBtn").addEventListener("click", () => {
-        scale = Math.max(.65, +(scale - .05).toFixed(2));
-        document.documentElement.style.setProperty("--scale", scale);
+        scale = Math.max(.65,+(scale-.05).toFixed(2));
+        document.documentElement.style.setProperty("--scale",scale);
       });
       $("largerBtn").addEventListener("click", () => {
-        scale = Math.min(1.35, +(scale + .05).toFixed(2));
-        document.documentElement.style.setProperty("--scale", scale);
+        scale = Math.min(1.35,+(scale+.05).toFixed(2));
+        document.documentElement.style.setProperty("--scale",scale);
       });
-      $("wakeBtn").addEventListener("click", async () => {
-        if (wakeRequested) {
-          wakeRequested = false;
-          if (wakeLock) await wakeLock.release();
-          wakeLock = null;
-          setWakeStatus(false);
-        } else if ("wakeLock" in navigator) {
-          wakeRequested = true;
-          await acquireWakeLock();
-          setWakeStatus(wakeRequested);
-        } else {
-          $("clock-status").textContent = "SCREEN WAKE LOCK NOT SUPPORTED";
-        }
+      $("fieldBtn").addEventListener("click", () => {
+        const active = document.body.classList.toggle("field-mode");
+        $("fieldBtn").textContent = active ? "현장 모드 종료" : "현장 모드";
+        $("fieldBtn").setAttribute("aria-pressed",String(active));
       });
-      $("fullBtn").addEventListener("click", async () => {
-        try {
-          if (!document.fullscreenElement) await document.documentElement.requestFullscreen();
-          else await document.exitFullscreen();
-        } catch { /* Fullscreen may be blocked by the browser. */ }
-      });
-      document.addEventListener("fullscreenchange", () => {
-        $("fullBtn").textContent = document.fullscreenElement ? "전체 화면 종료" : "전체 화면";
-      });
-      document.addEventListener("visibilitychange", () => {
-        if (document.visibilityState === "visible" && wakeRequested && !wakeLock) acquireWakeLock();
-      });
-      document.addEventListener("keydown", (event) => {
+      document.addEventListener("keydown", event => {
         if (event.target.closest("button")) return;
-        if (event.key === "f" || event.key === "F") $("fullBtn").click();
+        if (event.key === "f" || event.key === "F") $("fieldBtn").click();
         if (event.key === "+" || event.key === "=") $("largerBtn").click();
         if (event.key === "-") $("smallerBtn").click();
         if (event.key === "r" || event.key === "R") $("colorBtn").click();
-        if (event.key === "w" || event.key === "W") $("wakeBtn").click();
       });
 
       renderClock();
+      loadWeather(weatherCoordinates.latitude,weatherCoordinates.longitude,weatherCoordinates.label);
+      window.setInterval(() => {
+        loadWeather(weatherCoordinates.latitude,weatherCoordinates.longitude,weatherCoordinates.label);
+      },15*60*1000);
     })();
   </script>
 </body>
