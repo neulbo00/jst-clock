@@ -37,7 +37,7 @@
             <span class="text-xs sm:text-sm font-semibold tracking-wider text-slate-400">JAPAN STANDARD TIME (UTC+9)</span>
         </div>
         <div class="flex items-center gap-4">
-            <div id="jst-date" class="mono-font text-sm sm:text-base font-bold text-slate-200">Loading...</div>
+            <div id="jst-date" class="mono-font text-sm sm:text-base font-bold text-slate-200">2026.00.00 (...)</div>
             <div id="tokyo-weather" class="mono-font text-xs sm:text-sm text-slate-400 bg-slate-800/80 px-3 py-1 rounded-lg border border-slate-700/50">
                 도쿄 날씨 확인중...
             </div>
@@ -79,3 +79,175 @@
             <button onclick="adjustFontSize(10)" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs sm:text-sm font-semibold rounded-xl border border-slate-700 transition">
                 글자 크게 (+)
             </button>
+
+            <!-- Wake Lock Toggle -->
+            <button id="btn-wakelock" onclick="toggleWakeLock()" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs sm:text-sm font-semibold rounded-xl border border-slate-700 transition flex items-center justify-center gap-2">
+                <span>💡 화면유지: <span id="wakelock-status" class="text-red-400">OFF</span></span>
+            </button>
+
+            <!-- Fullscreen Toggle -->
+            <button onclick="toggleFullScreen()" class="col-span-2 sm:col-span-1 px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs sm:text-sm font-semibold rounded-xl border border-slate-700 transition">
+                전체 화면 ⤢
+            </button>
+        </div>
+
+        <!-- System Status Bar -->
+        <div class="flex flex-col sm:flex-row justify-between items-center text-xs text-slate-500 px-2 py-1 gap-1">
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                <span>NICT-aligned JST Direct Engine</span>
+            </div>
+            <div>
+                <a href="https://www.nict.go.jp/JST/JST5.html" target="_blank" rel="noopener" class="hover:text-slate-300 underline">NICT JST Clock ↗</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        let isRedMode = true;
+
+        function toggleColorMode() {
+            isRedMode = !isRedMode;
+            applyInitialColor();
+        }
+
+        function applyInitialColor() {
+            const hours = document.getElementById('clock-hours');
+            const minutes = document.getElementById('clock-minutes');
+            const seconds = document.getElementById('clock-seconds');
+            const colorIndicator = document.getElementById('color-indicator');
+            const colorText = document.getElementById('color-text');
+            const targets = [hours, minutes, seconds];
+            
+            targets.forEach(el => {
+                if (isRedMode) {
+                    el.classList.add('text-red-glow');
+                    el.classList.remove('text-white-glow');
+                } else {
+                    el.classList.add('text-white-glow');
+                    el.classList.remove('text-red-glow');
+                }
+            });
+
+            if (colorIndicator && colorText) {
+                if (isRedMode) {
+                    colorIndicator.className = "w-3 h-3 rounded-full bg-red-500 inline-block";
+                    colorText.textContent = "레드 모드";
+                } else {
+                    colorIndicator.className = "w-3 h-3 rounded-full bg-white inline-block";
+                    colorText.textContent = "화이트 모드";
+                }
+            }
+        }
+
+        let currentScale = 1.0;
+        function adjustFontSize(delta) {
+            currentScale += delta * 0.05;
+            if (currentScale < 0.6) currentScale = 0.6;
+            if (currentScale > 1.8) currentScale = 1.8;
+
+            const hours = document.getElementById('clock-hours');
+            const minutes = document.getElementById('clock-minutes');
+            const seconds = document.getElementById('clock-seconds');
+
+            [hours, minutes, seconds].forEach(el => {
+                el.style.transform = `scale(${currentScale})`;
+                el.style.display = 'inline-block';
+            });
+        }
+
+        let wakeLock = null;
+        async function toggleWakeLock() {
+            if ('wakeLock' in navigator) {
+                try {
+                    if (wakeLock === null) {
+                        wakeLock = await navigator.wakeLock.request('screen');
+                        document.getElementById('wakelock-status').textContent = 'ON';
+                        document.getElementById('wakelock-status').className = 'text-emerald-400 font-bold';
+                        wakeLock.addEventListener('release', () => {
+                            wakeLock = null;
+                            document.getElementById('wakelock-status').textContent = 'OFF';
+                            document.getElementById('wakelock-status').className = 'text-red-400';
+                        });
+                    } else {
+                        await wakeLock.release();
+                        wakeLock = null;
+                        document.getElementById('wakelock-status').textContent = 'OFF';
+                        document.getElementById('wakelock-status').className = 'text-red-400';
+                    }
+                } catch (err) {
+                    alert('화면 유지(Wake Lock)를 활성화할 수 없습니다.');
+                }
+            } else {
+                alert('이 브라우저는 화면 유지 기능을 지원하지 않습니다.');
+            }
+        }
+
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.log(err);
+                });
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+
+        async function fetchTokyoWeather() {
+            try {
+                const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=35.6762&longitude=139.6503&current=temperature_2m,weather_code');
+                const data = await res.json();
+                if (data && data.current) {
+                    const temp = Math.round(data.current.temperature_2m);
+                    const code = data.current.weather_code;
+                    let weatherDesc = "맑음";
+                    if (code >= 1 && code <= 3) weatherDesc = "구름";
+                    else if (code >= 51 && code <= 67) weatherDesc = "비";
+                    else if (code >= 71 && code <= 77) weatherDesc = "눈";
+                    else if (code >= 95) weatherDesc = "뇌우";
+                    
+                    document.getElementById('tokyo-weather').textContent = `도쿄 ${temp}°C (${weatherDesc})`;
+                }
+            } catch (e) {
+                document.getElementById('tokyo-weather').textContent = `도쿄 날씨 정보 없음`;
+            }
+        }
+
+        // 100% Fail-safe JST Time calculation using UTC offset
+        function updateClock() {
+            try {
+                const now = new Date();
+                // Get UTC time in milliseconds and add JST offset (+9 hours)
+                const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+                const jst = new Date(utc + (3600000 * 9));
+
+                const h = String(jst.getHours()).padStart(2, '0');
+                const m = String(jst.getMinutes()).padStart(2, '0');
+                const s = String(jst.getSeconds()).padStart(2, '0');
+                const ms = Math.floor(now.getMilliseconds() / 100);
+
+                document.getElementById('clock-hours').textContent = h;
+                document.getElementById('clock-minutes').textContent = m;
+                document.getElementById('clock-seconds').textContent = s;
+                document.getElementById('clock-millis').textContent = ms;
+
+                // Date formatting
+                const years = jst.getFullYear();
+                const months = String(jst.getMonth() + 1).padStart(2, '0');
+                const days = String(jst.getDate()).padStart(2, '0');
+                const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
+                const weekday = weekdays[jst.getDay()];
+
+                document.getElementById('jst-date').textContent = `${years}.${months}.${days} (${weekday})`;
+            } catch (err) {
+                console.error("Clock update error:", err);
+            }
+        }
+
+        applyInitialColor();
+        updateClock();
+        setInterval(updateClock, 50);
+        fetchTokyoWeather();
+        setInterval(fetchTokyoWeather,
