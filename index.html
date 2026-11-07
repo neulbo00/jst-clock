@@ -1,44 +1,66 @@
-<!doctype html>
-<html lang="ja">
+<!DOCTYPE html>
+<html lang="ko">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#000000">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="description" content="Minimal Japan Standard Time display">
-  <title>JST CLOCK</title>
-  <link rel="stylesheet" href="./css/style.css?v=4">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>JST Field Clock</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #000000;
+            color: #f1f5f9;
+            touch-action: manipulation;
+        }
+        .mono-font {
+            font-family: 'JetBrains Mono', monospace;
+            font-variant-numeric: tabular-nums;
+        }
+        .text-red-glow {
+            color: #ff1a1a;
+            text-shadow: 0 0 12px rgba(255, 0, 0, 0.3);
+        }
+        .text-white-glow {
+            color: #ffffff;
+            text-shadow: 0 0 12px rgba(255, 255, 255, 0.3);
+        }
+    </style>
 </head>
-<body>
-  <main class="clock-shell">
-    <header class="topline">
-      <div class="brand">neulbo <span>CLOCK</span></div>
-      <div class="timezone">JAPAN STANDARD TIME <span>UTC+09:00</span></div>
+<body class="min-h-screen flex flex-col justify-between p-4 sm:p-6 select-none">
+
+    <!-- Header / Date & Weather -->
+    <header class="w-full max-w-4xl mx-auto flex flex-col sm:flex-row justify-between items-center bg-slate-900/80 border border-slate-800 rounded-xl px-5 py-3 backdrop-blur-sm gap-2">
+        <div class="flex items-center gap-3">
+            <span class="inline-block w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse"></span>
+            <span class="text-xs sm:text-sm font-semibold tracking-wider text-slate-400">JAPAN STANDARD TIME (UTC+9)</span>
+        </div>
+        <div class="flex items-center gap-4">
+            <div id="jst-date" class="mono-font text-sm sm:text-base font-bold text-slate-200">----.--.-- (...)</div>
+            <div id="tokyo-weather" class="mono-font text-xs sm:text-sm text-slate-400 bg-slate-800/80 px-3 py-1 rounded-lg border border-slate-700/50">
+                도쿄 --°C
+            </div>
+        </div>
     </header>
-    <section class="clock" aria-label="Current Japan time">
-      <div class="time-row">
-        <span id="hours">--</span><i>:</i><span id="minutes">--</span><i>:</i><span id="seconds">--</span><span class="milliseconds" id="milliseconds">.</span>
-      </div>
-    </section>
-    <section class="date-row">
-      <div id="date">----</div>
-      <div id="weekday">---</div>
-    </section>
-    <footer class="status-area">
-      <div class="status-line">
-        <span class="status-dot" id="status-dot"></span>
-        <span id="sync-status">DEVICE CLOCK · NOT NICT-SYNCED</span>
-      </div>
-      <div class="status-note" id="status-note">
-        This first build displays the device clock. NICT NTP synchronization is not yet connected.
-      </div>
-      <div class="footer-links">
-        <a href="https://www.nict.go.jp/JST/JST5.html" target="_blank" rel="noopener">NICT JST CLOCK ↗</a>
-        <button id="fullscreen" type="button">FULL SCREEN</button>
-      </div>
-    </footer>
-  </main>
-  <script src="./js/clock.js?v=4"></script>
-</body>
-</html>
+
+    <!-- Main Clock Section -->
+    <main class="w-full max-w-4xl mx-auto flex flex-col items-center justify-center my-auto py-8">
+        <div class="text-center w-full">
+            <!-- Clock Display -->
+            <div class="inline-flex items-baseline justify-center flex-wrap px-4 py-6 bg-slate-950/90 border border-slate-800/80 rounded-2xl shadow-2xl w-full">
+                <span id="clock-hours" class="mono-font font-extrabold text-7xl sm:text-9xl tracking-tight transition-all">--</span>
+                <span class="mono-font font-bold text-6xl sm:text-8xl mx-1 sm:mx-2 text-slate-600 animate-pulse">:</span>
+                <span id="clock-minutes" class="mono-font font-extrabold text-7xl sm:text-9xl tracking-tight transition-all">--</span>
+                <span class="mono-font font-bold text-6xl sm:text-8xl mx-1 sm:mx-2 text-slate-600 animate-pulse">:</span>
+                <span id="clock-seconds" class="mono-font font-extrabold text-7xl sm:text-9xl tracking-tight transition-all">--</span>
+                <span class="mono-font font-bold text-6xl sm:text-8xl mx-1 sm:mx-2 text-slate-600">.</span>
+                <span id="clock-millis" class="mono-font font-bold text-4xl sm:text-6xl text-slate-400 w-16 sm:w-24 text-left">0</span>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer Controls & Status -->
+    <footer class="w-full max-w-4xl mx-auto flex flex-col gap-3">
+        <!-- Controls Toolbar -->
+        <div class="grid grid-cols-
