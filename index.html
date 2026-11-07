@@ -20,40 +20,46 @@
             font-variant-numeric: tabular-nums;
         }
         .text-red-glow {
-            color: #ff1a1a !important;
-            text-shadow: 0 0 16px rgba(255, 0, 0, 0.4);
+            color: #ff2a2a !important;
+            text-shadow: 0 0 20px rgba(255, 30, 30, 0.45);
         }
         .text-white-glow {
             color: #ffffff !important;
-            text-shadow: 0 0 16px rgba(255, 255, 255, 0.4);
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.45);
+        }
+        .glass-card {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(51, 65, 85, 0.6);
         }
     </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between p-4 sm:p-6 bg-black">
 
     <!-- Header / JST Date & Weather -->
-    <header class="w-full max-w-4xl mx-auto flex flex-col sm:flex-row justify-between items-center bg-slate-900/90 border border-slate-800 rounded-xl px-5 py-3 gap-2">
+    <header class="w-full max-w-4xl mx-auto flex flex-col sm:flex-row justify-between items-center glass-card rounded-2xl px-6 py-4 shadow-xl gap-3">
         <div class="flex items-center gap-3">
-            <span class="inline-block w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse"></span>
-            <span class="text-xs sm:text-sm font-semibold tracking-wider text-slate-400">JAPAN STANDARD TIME (UTC+9)</span>
+            <span class="inline-block w-3 h-3 rounded-full bg-red-500 animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.8)]"></span>
+            <span class="text-xs sm:text-sm font-bold tracking-widest text-slate-300">JAPAN STANDARD TIME (UTC+9)</span>
         </div>
-        <div class="flex items-center gap-3">
-            <div id="jst-date" class="mono-font text-sm sm:text-base font-bold text-slate-200">2026.00.00 (...)</div>
-            <div id="tokyo-weather" class="mono-font text-xs sm:text-sm text-slate-300 bg-slate-800 px-3 py-1 rounded-lg border border-slate-700">
-                도쿄 날씨 로딩중...
+        <div class="flex items-center gap-4">
+            <div id="jst-date" class="mono-font text-sm sm:text-base font-bold text-slate-100">----.--.-- (...)</div>
+            <div id="tokyo-weather" class="mono-font text-xs sm:text-sm text-slate-300 bg-slate-800/90 px-3.5 py-1.5 rounded-xl border border-slate-700/80 shadow-inner flex items-center gap-1.5">
+                <span>도쿄</span> <span id="weather-val" class="font-bold text-amber-400">날씨 불러오는 중...</span>
             </div>
         </div>
     </header>
 
     <!-- Main Clock Section -->
-    <main class="w-full max-w-4xl mx-auto flex flex-col items-center justify-center my-auto py-8">
+    <main class="w-full max-w-4xl mx-auto flex flex-col items-center justify-center my-auto py-6">
         <div class="text-center w-full">
-            <div class="inline-flex items-baseline justify-center px-4 py-8 bg-slate-950 border border-slate-800/80 rounded-2xl shadow-2xl w-full">
-                <span id="clock-hours" class="mono-font font-extrabold text-7xl sm:text-9xl tracking-tight text-red-glow">00</span>
+            <div class="inline-flex items-baseline justify-center px-4 py-10 bg-slate-950/90 border border-slate-800/90 rounded-3xl shadow-[0_0_50px_rgba(0,0,0,0.9)] w-full">
+                <span id="clock-hours" class="mono-font font-extrabold text-7xl sm:text-9xl tracking-tight text-red-glow transition-transform duration-100">00</span>
                 <span class="mono-font font-bold text-6xl sm:text-8xl mx-1 sm:mx-2 text-slate-600 animate-pulse">:</span>
-                <span id="clock-minutes" class="mono-font font-extrabold text-7xl sm:text-9xl tracking-tight text-red-glow">00</span>
+                <span id="clock-minutes" class="mono-font font-extrabold text-7xl sm:text-9xl tracking-tight text-red-glow transition-transform duration-100">00</span>
                 <span class="mono-font font-bold text-6xl sm:text-8xl mx-1 sm:mx-2 text-slate-600 animate-pulse">:</span>
-                <span id="clock-seconds" class="mono-font font-extrabold text-7xl sm:text-9xl tracking-tight text-red-glow">00</span>
+                <span id="clock-seconds" class="mono-font font-extrabold text-7xl sm:text-9xl tracking-tight text-red-glow transition-transform duration-100">00</span>
                 <span class="mono-font font-bold text-6xl sm:text-8xl mx-1 sm:mx-2 text-slate-600">.</span>
                 <span id="clock-millis" class="mono-font font-bold text-4xl sm:text-6xl text-slate-400 w-12 sm:w-20 text-left">0</span>
             </div>
@@ -61,38 +67,38 @@
     </main>
 
     <!-- Footer Controls -->
-    <footer class="w-full max-w-4xl mx-auto flex flex-col gap-3">
-        <div class="grid grid-cols-2 sm:flex sm:flex-wrap justify-center gap-2">
+    <footer class="w-full max-w-4xl mx-auto flex flex-col gap-4">
+        <div class="grid grid-cols-2 sm:flex sm:flex-wrap justify-center gap-2.5">
             <!-- Color Mode Toggle -->
-            <button onclick="toggleColorMode()" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs sm:text-sm font-semibold rounded-xl border border-slate-700 transition flex items-center justify-center gap-2">
-                <span id="color-indicator" class="w-3 h-3 rounded-full bg-red-500 inline-block"></span>
+            <button onclick="toggleColorMode()" class="px-4 py-3 bg-slate-900 hover:bg-slate-800 text-slate-200 text-xs sm:text-sm font-semibold rounded-xl border border-slate-700/80 transition active:scale-95 flex items-center justify-center gap-2 shadow-md">
+                <span id="color-indicator" class="w-3 h-3 rounded-full bg-red-500 inline-block shadow-[0_0_6px_rgba(239,68,68,0.8)]"></span>
                 <span id="color-text">레드 모드</span>
             </button>
 
             <!-- Font Size - -->
-            <button onclick="adjustFontSize(-0.1)" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs sm:text-sm font-semibold rounded-xl border border-slate-700 transition">
+            <button onclick="adjustFontSize(-0.1)" class="px-4 py-3 bg-slate-900 hover:bg-slate-800 text-slate-200 text-xs sm:text-sm font-semibold rounded-xl border border-slate-700/80 transition active:scale-95 shadow-md">
                 글자 작게 (-)
             </button>
 
             <!-- Font Size + -->
-            <button onclick="adjustFontSize(0.1)" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs sm:text-sm font-semibold rounded-xl border border-slate-700 transition">
+            <button onclick="adjustFontSize(0.1)" class="px-4 py-3 bg-slate-900 hover:bg-slate-800 text-slate-200 text-xs sm:text-sm font-semibold rounded-xl border border-slate-700/80 transition active:scale-95 shadow-md">
                 글자 크게 (+)
             </button>
 
             <!-- Wake Lock -->
-            <button onclick="toggleWakeLock()" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs sm:text-sm font-semibold rounded-xl border border-slate-700 transition">
+            <button onclick="toggleWakeLock()" class="px-4 py-3 bg-slate-900 hover:bg-slate-800 text-slate-200 text-xs sm:text-sm font-semibold rounded-xl border border-slate-700/80 transition active:scale-95 shadow-md">
                 💡 화면유지: <span id="wakelock-status" class="text-red-400 font-bold">OFF</span>
             </button>
 
             <!-- Fullscreen -->
-            <button onclick="toggleFullScreen()" class="col-span-2 sm:col-span-1 px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs sm:text-sm font-semibold rounded-xl border border-slate-700 transition">
+            <button onclick="toggleFullScreen()" class="col-span-2 sm:col-span-1 px-4 py-3 bg-slate-900 hover:bg-slate-800 text-slate-200 text-xs sm:text-sm font-semibold rounded-xl border border-slate-700/80 transition active:scale-95 shadow-md">
                 전체 화면 ⤢
             </button>
         </div>
 
-        <div class="flex justify-between items-center text-xs text-slate-500 px-2">
-            <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> JST Field Engine v2.0</span>
-            <a href="https://www.nict.go.jp/JST/JST5.html" target="_blank" rel="noopener" class="underline hover:text-slate-400">NICT JST ↗</a>
+        <div class="flex justify-between items-center text-xs text-slate-400 px-2">
+            <span class="flex items-center gap-2 font-medium"><span class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.8)]"></span> JST Field Engine v2.5</span>
+            <a href="https://www.nict.go.jp/JST/JST5.html" target="_blank" rel="noopener" class="underline hover:text-slate-200 font-medium transition">NICT JST ↗</a>
         </div>
     </footer>
 
@@ -110,16 +116,16 @@
             var txt = document.getElementById('color-text');
 
             if (isRedMode) {
-                h.className = "mono-font font-extrabold text-7xl sm:text-9xl tracking-tight text-red-glow";
-                m.className = "mono-font font-extrabold text-7xl sm:text-9xl tracking-tight text-red-glow";
-                s.className = "mono-font font-extrabold text-7xl sm:text-9xl tracking-tight text-red-glow";
-                ind.className = "w-3 h-3 rounded-full bg-red-500 inline-block";
+                h.className = "mono-font font-extrabold text-7xl sm:text-9xl tracking-tight text-red-glow transition-transform duration-100";
+                m.className = "mono-font font-extrabold text-7xl sm:text-9xl tracking-tight text-red-glow transition-transform duration-100";
+                s.className = "mono-font font-extrabold text-7xl sm:text-9xl tracking-tight text-red-glow transition-transform duration-100";
+                ind.className = "w-3 h-3 rounded-full bg-red-500 inline-block shadow-[0_0_6px_rgba(239,68,68,0.8)]";
                 txt.textContent = "레드 모드";
             } else {
-                h.className = "mono-font font-extrabold text-7xl sm:text-9xl tracking-tight text-white-glow";
-                m.className = "mono-font font-extrabold text-7xl sm:text-9xl tracking-tight text-white-glow";
-                s.className = "mono-font font-extrabold text-7xl sm:text-9xl tracking-tight text-white-glow";
-                ind.className = "w-3 h-3 rounded-full bg-white inline-block";
+                h.className = "mono-font font-extrabold text-7xl sm:text-9xl tracking-tight text-white-glow transition-transform duration-100";
+                m.className = "mono-font font-extrabold text-7xl sm:text-9xl tracking-tight text-white-glow transition-transform duration-100";
+                s.className = "mono-font font-extrabold text-7xl sm:text-9xl tracking-tight text-white-glow transition-transform duration-100";
+                ind.className = "w-3 h-3 rounded-full bg-white inline-block shadow-[0_0_6px_rgba(255,255,255,0.8)]";
                 txt.textContent = "화이트 모드";
             }
         }
@@ -149,7 +155,7 @@
                             document.getElementById('wakelock-status').className = 'text-red-400 font-bold';
                         });
                     }).catch(function(err) {
-                        alert('화면 유지 실패');
+                        alert('화면 유지 설정 불가');
                     });
                 } else {
                     wakeLock.release();
@@ -168,32 +174,32 @@
             }
         }
 
+        // 도쿄 날씨 불러오기 (Open-Meteo API)
         function fetchWeather() {
-            var xhr = new XMLHttpRequest();
-            xhr.open('GET', 'https://api.open-meteo.com/v1/forecast?latitude=35.6762&longitude=139.6503&current=temperature_2m,weather_code', true);
-            xhr.onload = function() {
-                if (xhr.status === 200) {
-                    try {
-                        var data = JSON.parse(xhr.responseText);
-                        if (data && data.current) {
-                            var temp = Math.round(data.current.temperature_2m);
-                            var code = data.current.weather_code;
-                            var desc = "맑음";
-                            if (code >= 1 && code <= 3) desc = "구름";
-                            else if (code >= 51 && code <= 67) desc = "비";
-                            else if (code >= 71 && code <= 77) desc = "눈";
-                            else if (code >= 95) desc = "뇌우";
-                            document.getElementById('tokyo-weather').textContent = "도쿄 " + temp + "°C (" + desc + ")";
-                        }
-                    } catch(e) {}
+            var el = document.getElementById('weather-val');
+            var url = 'https://api.open-meteo.com/v1/forecast?latitude=35.6762&longitude=139.6503&current=temperature_2m,weather_code';
+            
+            fetch(url).then(function(res) {
+                return res.json();
+            }).then(function(data) {
+                if (data && data.current) {
+                    var temp = Math.round(data.current.temperature_2m);
+                    var code = data.current.weather_code;
+                    var desc = "☀️ 맑음";
+                    if (code >= 1 && code <= 3) desc = "⛅ 구름";
+                    else if (code >= 51 && code <= 67) desc = "🌧️ 비";
+                    else if (code >= 71 && code <= 77) desc = "❄️ 눈";
+                    else if (code >= 95) desc = "⚡ 뇌우";
+                    
+                    if (el) el.innerHTML = '<span class="text-white font-bold">' + temp + '°C</span> <span class="text-slate-300 font-normal">' + desc + '</span>';
                 }
-            };
-            xhr.send();
+            }).catch(function(err) {
+                if (el) el.textContent = '날씨 정보 없음';
+            });
         }
 
         function runClock() {
             var now = new Date();
-            // JST Calc (UTC + 9 Hours)
             var utc = now.getTime() + (now.getTimezoneOffset() * 60000);
             var jst = new Date(utc + (3600000 * 9));
 
@@ -216,11 +222,11 @@
             document.getElementById('jst-date').textContent = y + '.' + (m < 10 ? '0' : '') + m + '.' + (d < 10 ? '0' : '') + d + ' (' + day + ')';
         }
 
-        // Run Engine
-        setInterval(runClock, 50);
+        // 실행
         runClock();
+        setInterval(runClock, 50);
         fetchWeather();
-        setInterval(fetchWeather, 900000);
+        setInterval(fetchWeather, 900000); // 15분마다 날씨 갱신
     </script>
 </body>
 </html>
